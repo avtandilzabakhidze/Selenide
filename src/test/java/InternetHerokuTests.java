@@ -26,6 +26,13 @@ public class InternetHerokuTests {
     }
 
     @Test
+    public void testKeyPresses() {
+        $(By.linkText("Key Presses")).click();
+        $(By.id("target")).pressTab();
+        $(By.id("result")).shouldHave(text("You entered: TAB"));
+    }
+
+    @Test
     public void testAddRemoveElements() {
         $(By.linkText("Add/Remove Elements")).click();
 
