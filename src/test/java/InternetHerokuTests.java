@@ -7,6 +7,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.File;
+import java.time.Duration;
+import java.util.List;
+
 import static com.codeborne.selenide.Selenide.*;
 import static com.codeborne.selenide.Condition.*;
 
@@ -136,5 +140,43 @@ public class InternetHerokuTests {
         actions().dragAndDrop(A, B).perform();
 
         Assert.assertEquals(A.getText(), "B", "\n Drag and Drop Don't Work \n");
+    }
+
+    @Test
+    public void testFileUpload() {
+        $(By.linkText("File Upload")).click();
+        SelenideElement uploadButton = $(By.id("file-upload"));
+        String imgPath = System.getProperty("user.dir") + "\\resources\\img\\images.jfif";
+        uploadButton.uploadFile(new File(imgPath));
+    }
+
+    @Test
+    public void testDynamicContent() {
+        $(By.linkText("Dynamic Content")).click();
+        List<String> oldTexts = $$(By.xpath("//div[@id=\"content\"]//div[@class=\"large-10 columns\"]")).texts();
+        $(By.linkText("click here")).click();
+        sleep(3000);
+        List<String> newTexts = $$(By.xpath("//div[@id=\"content\"]//div[@class=\"large-10 columns\"]")).texts();
+
+        Assert.assertNotEquals(oldTexts, newTexts, "\n dynamic content did not changed \n");
+    }
+
+    @Test
+    public void testDynamicControls() {
+        $(By.linkText("Dynamic Controls")).click();
+
+        $(By.xpath("//button[text() = 'Remove']")).click();
+        $(By.id("checkbox")).shouldNotBe(visible);
+        $(By.id("message")).shouldHave(text("It's gone!"), Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void testDynamicLoading() {
+        $(By.linkText("Dynamic Loading")).click();
+
+        $(By.linkText("Example 1: Element on page that is hidden")).click();
+        $("#start button").click();
+        $(By.id("loading")).should(disappear, Duration.ofSeconds(10));
+        $(By.id("finish")).shouldBe(visible).shouldHave(text("Hello World!"));
     }
 }
